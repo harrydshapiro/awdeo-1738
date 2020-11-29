@@ -8,7 +8,6 @@ function initLogRocket () {
 declare global {
   interface Window { dataLayer: any; }
 }
-
 window.dataLayer = window.dataLayer || {}
 
 function initGA () {

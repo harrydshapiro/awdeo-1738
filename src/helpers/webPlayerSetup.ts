@@ -3,7 +3,7 @@
 export default function webPlayerSetup (accessToken: string, playerCallback: any) {
   window.onSpotifyWebPlaybackSDKReady = () => {
     const player = new Spotify.Player({
-      name: 'My Test Spotify Player',
+      name: 'AWDEO 1738',
       getOAuthToken: (callback: any) => {
         callback(accessToken)
       }

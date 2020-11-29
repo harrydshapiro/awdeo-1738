@@ -24,6 +24,14 @@ body, p, h1 {
   color: white;
 }
 
+h1 {
+  font-family: "Microgramma"
+}
+
+div, p {
+  font-family: "Neue Montreal"
+}
+
 #app {
   display: flex;
   justify-content: center;
@@ -32,6 +40,11 @@ body, p, h1 {
 }
 
 svg, svg:focus {
-    outline:none !important;
+  outline:none !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 </style>

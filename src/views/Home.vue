@@ -1,16 +1,24 @@
 <template>
   <div class="home">
-    <Spines
-      :albums="leftAlbums"
-      :text-baseline="'left'"
-    />
-    <RecordCover
-      :album="currentAlbum"
-    />
-    <Spines
-      :albums="rightAlbums"
-      :text-baseline="'right'"
-    />
+    <template v-if="showAbout">
+      <About />
+    </template>
+    <template v-else>
+      <Spines
+        :albums="leftAlbums"
+        :text-baseline="'left'"
+      />
+      <RecordCover
+        :album="currentAlbum"
+      />
+      <Spines
+        :albums="rightAlbums"
+        :text-baseline="'right'"
+      />
+      <div class="about-toggle" @click="showAboutScreen">
+        ?
+      </div>
+    </template>
   </div>
 </template>
 
@@ -19,16 +27,19 @@ import { Vue, Component } from 'vue-property-decorator'
 import store from '@/store'
 import Spines from '@/components/Spines.vue'
 import RecordCover from '@/components/RecordCover.vue'
+import About from '@/components/About.vue'
 import hotkeys from 'hotkeys-js'
 
 @Component({
   components: {
     Spines,
-    RecordCover
+    RecordCover,
+    About
   }
 })
 export default class Home extends Vue {
   currentSpineIndex = 0
+  showAbout = false
 
   async mounted () {
     store.dispatch.getUserAlbums()
@@ -51,6 +62,10 @@ export default class Home extends Vue {
     return this.albums[this.currentSpineIndex]
   }
 
+  showAboutScreen () {
+    this.showAbout = true
+  }
+
   initializeHotkeys () {
     hotkeys('left', (event, handler) => {
       event.preventDefault()
@@ -69,5 +84,12 @@ export default class Home extends Vue {
 .home {
   display: flex;
   width: 100vw;
+}
+
+.about-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: white;
 }
 </style>

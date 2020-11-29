@@ -1,32 +1,43 @@
 module.exports = {
-  root: true,
-  env: {
-    node: true
+  parserOptions: {
+    parser: '@typescript-eslint/parser'
   },
   extends: [
-    "plugin:vue/essential",
-    "eslint:recommended",
-    "@vue/typescript/recommended",
-    "@vue/prettier",
-    "@vue/prettier/@typescript-eslint"
+    'plugin:vue/recommended',
+    'standard'
   ],
-  parserOptions: {
-    ecmaVersion: 2020
-  },
+  plugins: [
+    '@typescript-eslint',
+    'vue'
+  ],
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "prefixWithI": "always"
+    'no-console': 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'vue/html-self-closing': 0,
+    'vue/no-confusing-v-for-v-if': 0,
+    'vue/no-use-v-if-with-v-for': 0,
+    'vue/max-attributes-per-line': 0,
+    'vue/require-prop-types': 0,
+    'vue/no-v-html': 0,
+    'no-useless-escape': 0,
+    'no-unused-vars': 0,
+    'vue/component-name-in-template-casing': 2,
+    'no-prototype-builtins': 0,
+    indent: 'off',
+    '@typescript-eslint/indent': ['error', 2],
+    "camelcase": 0
   },
-  overrides: [
-    {
-      files: [
-        "**/__tests__/*.{j,t}s?(x)",
-        "**/tests/unit/**/*.spec.{j,t}s?(x)"
-      ],
-      env: {
-        jest: true
-      }
+  env: {
+    browser: true,
+    jquery: true
+  },
+  overrides: [{
+    files: [
+      '**/__tests__/*.{j,t}s?(x)',
+      '**/*.spec.{j,t}s?(x)'
+    ],
+    env: {
+      jest: true
     }
-  ]
-};
+  }]
+}

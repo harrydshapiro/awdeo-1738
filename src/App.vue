@@ -30,4 +30,8 @@ body, p, h1 {
   align-items: center;
   height: 100vh;
 }
+
+svg, svg:focus {
+    outline:none !important;
+}
 </style>

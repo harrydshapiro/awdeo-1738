@@ -109,12 +109,18 @@ const {
       const { playerDeviceId, currentPlayerURI } = store.state
       if (!playerDeviceId) return
 
-      if (store.state.playerPaused) {
+      if (!store.state.playerPaused && currentPlayerURI !== uri) {
+        // If music is playing and you switch albums
         await api.playPlayback(playerDeviceId, uri)
-      } else if (currentPlayerURI !== uri) {
-        await api.playPlayback(playerDeviceId)
-      } else {
+      } else if (!store.state.playerPaused && currentPlayerURI === uri) {
+        // If music is playing and you pause the current album
         await api.pausePlayback(playerDeviceId)
+      } else if (store.state.playerPaused && currentPlayerURI === uri) {
+        // If music is paused and you replay current album
+        await api.playPlayback(playerDeviceId)
+      } else if (store.state.playerPaused && currentPlayerURI !== uri) {
+        // If music is paused and you play new album
+        await api.playPlayback(playerDeviceId, uri)
       }
     }
   },

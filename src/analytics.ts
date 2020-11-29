@@ -12,8 +12,8 @@ window.dataLayer = window.dataLayer || {}
 
 function initGA () {
   const gaScriptTag = document.createElement('script')
-  gaScriptTag.src = 'https://www.googletagmanager.com/gtag/js?id=G-KGERYQRF9N'
   gaScriptTag.async = true
+  gaScriptTag.src = 'https://www.googletagmanager.com/gtag/js?id=G-KGERYQRF9N'
   document.body.appendChild(gaScriptTag)
   window.dataLayer = window.dataLayer || []
   function gtag () { window.dataLayer.push(arguments) }

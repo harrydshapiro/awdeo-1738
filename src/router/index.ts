@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig, Route, NavigationGuardNext } from 'vue-router'
-import Home from '@/views/Home.vue'
+import Music from '@/views/Music.vue'
 import SpotifyRequester from '@/api/spotifyRequester'
 import { parseQS } from '@/helpers'
 import webPlayerSetup from '@/helpers/webPlayerSetup'
@@ -22,9 +22,14 @@ const redirectToLogin = (to: Route, from: Route, next: NavigationGuardNext<Vue>)
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Music',
+    component: Music,
     beforeEnter: redirectToLogin
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
     path: '/code-redirect',
@@ -34,7 +39,7 @@ const routes: Array<RouteConfig> = [
       await SpotifyRequester.fetchTokens(code)
       webPlayerSetup(SpotifyRequester.accessToken!, store.dispatch.addPlayer)
       next({
-        name: 'Home',
+        name: 'Music',
         replace: true
       })
     }

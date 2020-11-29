@@ -1,7 +1,7 @@
 <template>
   <div class="record-cover">
     <h1 class="album-name">
-      {{ album.name }}
+      {{ album && album.name }}
     </h1>
     <div class="album-artwork" @click="togglePlayback">
       <div class="play-pause-icon-container">
@@ -18,21 +18,37 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import store from '@/store'
+import hotkeys from 'hotkeys-js'
 
 @Component({})
 export default class RecordCover extends Vue {
-  @Prop({ required: true }) album!: SpotifyApi.AlbumObjectFull
+  @Prop({ required: true }) album?: SpotifyApi.AlbumObjectFull
+
+  mounted () {
+    this.initializeHotKeys()
+  }
 
   get recordCoverImgSrc () {
-    return this.album.images[0].url
+    return this.album?.images[0].url
   }
 
   get currentlyPlayingThisAlbum () {
-    return !store.state.playerPaused && store.state.currentPlayerURI === this.album.uri
+    return !store.state.playerPaused && store.state.currentPlayerURI === this.album?.uri
   }
 
   togglePlayback () {
-    store.dispatch.togglePlayState(this.album.uri)
+    const uri = this.album?.uri
+    if (!uri) return
+    store.dispatch.togglePlayState(uri)
+  }
+
+  initializeHotKeys () {
+    hotkeys('space', (event, handler) => {
+      event.preventDefault()
+      const uri = this.album?.uri
+      if (!uri) return
+      store.dispatch.togglePlayState(uri)
+    })
   }
 }
 </script>

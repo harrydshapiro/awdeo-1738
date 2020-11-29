@@ -2,7 +2,7 @@
   <div class="about">
     <div class="description">
       <p>
-        AWDEO 1738 is designed for people who can't afford to listen as much vinyl as they would like.
+        AWDEO 1738 is a stereo system designed for people who can't afford to listen to vinyl as much as they would like.
       </p>
       <br>
       <p>
@@ -14,7 +14,7 @@
       </p>
       <br>
       <p>
-        It is intentionally inconvenient in all the best ways. And it doesn't cost any more than your Spotify subscription.
+        Records are organized by artist name. Use your &lt; and > keys to flip through records. Press a letter to jump to a particular artist. Press shift-s to toggle shuffle.
       </p>
     </div>
     <div class="contact">

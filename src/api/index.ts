@@ -43,5 +43,9 @@ export default {
   async pausePlayback (deviceId: string) {
     const path = `/me/player/pause?device_id=${deviceId}`
     return await SpotifyRequester.sendRequest('PUT', path)
+  },
+
+  async getUserInfo () {
+    return await SpotifyRequester.sendRequest('get', '/me') as SpotifyApi.UserObjectPrivate
   }
 }

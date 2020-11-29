@@ -58,6 +58,7 @@ export default class Spines extends Vue {
 
   .spine {
     transform: rotate(180deg);
+    flex-direction: row-reverse;
 
     &:first-child {
       margin-left: auto;

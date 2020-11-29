@@ -1,15 +1,25 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { createDirectStore } from 'direct-vuex'
-import { merge } from 'lodash-es'
+import { merge, cloneDeep } from 'lodash-es'
 import api from '@/api'
+import { identifyUser } from '@/analytics'
+
+export enum AlbumSortMethod {
+  AlbumName,
+  ArtistName,
+  DateReleased,
+  Random
+}
 
 export interface RootState {
   albums: Record<SpotifyApi.AlbumObjectFull['id'], SpotifyApi.AlbumObjectFull>,
   player: Spotify.SpotifyPlayer | null,
   playerDeviceId: string | null,
   playerPaused: boolean,
-  currentPlayerURI: string | null
+  currentPlayerURI: string | null,
+  albumSortMethod: AlbumSortMethod,
+  albumSortDirection: 'ascending' | 'descending'
 }
 
 Vue.use(Vuex)
@@ -19,7 +29,9 @@ const state: RootState = {
   player: null,
   playerDeviceId: null,
   playerPaused: true,
-  currentPlayerURI: null
+  currentPlayerURI: null,
+  albumSortMethod: AlbumSortMethod.ArtistName,
+  albumSortDirection: 'descending'
 } as RootState // You have to cast it here else it complains about not having a user property initialization... however vuex composes the submodules itself so you can't actually provide a def
 
 const {
@@ -51,6 +63,9 @@ const {
     },
     setCurrentPlayerURI (state, uri: string | null) {
       state.currentPlayerURI = uri
+    },
+    setAlbumSorting (state, sortMethod: AlbumSortMethod) {
+      state.albumSortMethod = sortMethod
     }
   },
   actions: {
@@ -78,9 +93,12 @@ const {
         console.error('PLAYBACK ERROR OY VEY!', message)
       })
 
-      player.addListener('ready', ({ device_id }: any) => {
+      player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id)
+        dispatch.transferPlaybackToWebPlayer(device_id)
+        identifyUser()
       })
+
       player.addListener('player_state_changed', (message) => {
         console.log('Player state changed:', message)
 
@@ -90,10 +108,6 @@ const {
 
       player.addListener('not_ready', ({ device_id }: any) => {
         console.log('Device ID has gone offline', device_id)
-      })
-
-      player.addListener('ready', ({ device_id }) => {
-        dispatch.transferPlaybackToWebPlayer(device_id)
       })
 
       await player.connect()
@@ -107,6 +121,7 @@ const {
 
     async togglePlayState (context, uri: string) {
       const { playerDeviceId, currentPlayerURI } = store.state
+      console.log(playerDeviceId)
       if (!playerDeviceId) return
 
       if (!store.state.playerPaused && currentPlayerURI !== uri) {
@@ -122,11 +137,37 @@ const {
         // If music is paused and you play new album
         await api.playPlayback(playerDeviceId, uri)
       }
+    },
+
+    changeAlbumSorting (context, sortMethod: AlbumSortMethod) {
+      const { commit } = rootActionContext(context)
+      commit.setAlbumSorting(sortMethod)
     }
   },
   getters: {
-    albums (state): SpotifyApi.AlbumObjectFull[] {
-      return Object.values(state.albums)
+    sortedAlbums (state): SpotifyApi.AlbumObjectFull[] {
+      let filteredAlbums: SpotifyApi.AlbumObjectFull[] = cloneDeep(Object.values(state.albums))
+      switch (state.albumSortMethod) {
+        case AlbumSortMethod.AlbumName:
+          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+            if (albumA.name > albumB.name) return 1
+            else return -1
+          })
+          break
+        case AlbumSortMethod.ArtistName:
+          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+            if (albumA.artists[0].name > albumB.artists[0].name) return 1
+            else return -1
+          })
+          break
+        case AlbumSortMethod.DateReleased:
+          filteredAlbums = filteredAlbums.sort((albumA, albumB) => new Date(albumA.release_date).getMilliseconds() - new Date(albumB.release_date).getMilliseconds())
+          break
+        case AlbumSortMethod.Random:
+          filteredAlbums = filteredAlbums.sort(() => Math.random() - 0.5)
+          break
+      }
+      return filteredAlbums
     }
   }
 })

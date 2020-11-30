@@ -10,6 +10,7 @@
       v-for="(album, index) in albums"
       :key="index"
       class="spine"
+      @click="selectSpine(album)"
     >
       <span>{{ album.name }}</span>
       <span>{{ album.artists[0].name }}</span>
@@ -24,6 +25,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 export default class Spines extends Vue {
   @Prop({ required: true }) albums!: SpotifyApi.AlbumObjectFull[]
   @Prop({ required: true }) textBaseline!: 'left' | 'right'
+
+  selectSpine (album: SpotifyApi.AlbumObjectFull) {
+    this.$emit('selectSpine', album.id)
+  }
 }
 </script>
 
@@ -43,6 +48,7 @@ export default class Spines extends Vue {
   justify-content: space-between;
   border-left: 1px solid white;
   margin-left: 5px;
+  cursor: pointer;
 
   &.left {
     transform: rotate(180deg);

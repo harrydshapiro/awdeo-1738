@@ -3,6 +3,7 @@
     <Spines
       :albums="leftAlbums"
       :text-baseline="'left'"
+      @selectSpine="selectSpine"
     />
     <RecordCover
       :album="currentAlbum"
@@ -10,6 +11,7 @@
     <Spines
       :albums="rightAlbums"
       :text-baseline="'right'"
+      @selectSpine="selectSpine"
     />
   </div>
 </template>
@@ -87,6 +89,11 @@ export default class Music extends Vue {
         store.dispatch.changeAlbumSorting(AlbumSortMethod.ArtistName)
       }
     })
+  }
+
+  selectSpine (albumId: string) {
+    const albumIndex = this.albums.findIndex(album => album.id === albumId)
+    if (albumIndex !== -1) this.currentSpineIndex = albumIndex
   }
 }
 </script>

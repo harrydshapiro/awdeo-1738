@@ -1,8 +1,9 @@
 import LogRocket from 'logrocket'
 import api from './api'
+import { GOOGLE_ANALYTICS_KEY, LOG_ROCKET_APP } from './config'
 
 function initLogRocket () {
-  LogRocket.init('awdeo-1738/prod')
+  LogRocket.init(LOG_ROCKET_APP)
 }
 
 declare global {
@@ -21,7 +22,7 @@ function initGA () {
   // @ts-ignore
   gtag('js', new Date())
   // @ts-ignore
-  gtag('config', 'G-KGERYQRF9N')
+  gtag('config', GOOGLE_ANALYTICS_KEY)
 }
 
 export function initAnalytics () {

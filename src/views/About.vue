@@ -1,6 +1,9 @@
 <template>
   <div class="about">
     <div class="description">
+      <router-link to="/" class="cancel">
+        x
+      </router-link>
       <p>
         AWDEO 1738 is a stereo system designed for people who can't afford to listen to vinyl as much as they would like.
       </p>
@@ -56,10 +59,18 @@ export default class About extends Vue {
 
   .description {
     margin: 150px 0;
+    position: relative;
   }
 
   .contact {
     width: 100%;
+  }
+
+  .cancel {
+    position: absolute;
+    top: -44px;
+    left: -104px;
+    font-size: 22px;
   }
 }
 </style>

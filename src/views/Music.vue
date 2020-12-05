@@ -33,7 +33,6 @@ export default class Music extends Vue {
   currentSpineIndex = 0
 
   async mounted () {
-    store.dispatch.getUserAlbums()
     this.initializeHotkeys()
 
     const currentURI = store.state.currentPlayerURI

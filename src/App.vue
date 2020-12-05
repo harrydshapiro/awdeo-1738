@@ -8,13 +8,18 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import Nav from '@/components/Nav.vue'
+import store from '@/store'
 
 @Component({
   components: {
     Nav
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  mounted () {
+    store.dispatch.getUserAlbums()
+  }
+}
 </script>
 
 <style>

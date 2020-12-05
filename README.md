@@ -1,4 +1,4 @@
-# record-collection
+# AWDEO 1738
 
 [AWDEO 1738](https://www.awdeo1738.com) is a stereo system designed for people who can't afford to listen to vinyl as much as they would like.
 

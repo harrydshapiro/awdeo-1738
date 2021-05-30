@@ -1,30 +1,44 @@
 import SpotifyRequester from '@/api/spotifyRequester'
 
-type AlbumPagingObject = SpotifyApi.PagingObject<{added_at: string, album: SpotifyApi.AlbumObjectFull}>
+// This is how Spotify includes albums that come in paging objects
+interface SpotifyAlbumItem {
+  added_at: string,
+  album: SpotifyApi.AlbumObjectFull
+}
+
+async function getAndUnpackAllPageObjects <MediaType> (url: string): Promise<MediaType[]> {
+  const allResults: MediaType[] = []
+
+  const { items, total, limit } = await SpotifyRequester.sendRequest<SpotifyApi.PagingObject<MediaType>>('GET', '/me/albums')
+
+  allResults.push(...items)
+
+  const additionalRequests: Promise<SpotifyApi.PagingObject<MediaType>>[] = []
+
+  for (let i = items.length; i < total; i += limit) {
+    additionalRequests.push(SpotifyRequester.sendRequest<SpotifyApi.PagingObject<MediaType>>('GET', `/me/albums?offset=${i}`))
+  }
+
+  const additionalPagingObjects = await Promise.allSettled(additionalRequests) as PromiseFulfilledResult<SpotifyApi.PagingObject<MediaType>>[]
+
+  additionalPagingObjects.forEach(pagingObject => {
+    const { items } = pagingObject.value
+    allResults.push(...items)
+  })
+
+  return allResults
+}
 
 export default {
   async getAllUserAlbums () {
-    const allAlbums: SpotifyApi.AlbumObjectFull[] = []
+    const albumItems = await getAndUnpackAllPageObjects<SpotifyAlbumItem>('/me/albums')
+    const albums = albumItems.map(({ album }) => album)
+    return albums
+  },
 
-    const { items: initialItems, total, limit } = await SpotifyRequester.sendRequest<AlbumPagingObject>('GET', '/me/albums')
-    const initialAlbums = initialItems.map(item => item.album)
-
-    allAlbums.push(...initialAlbums)
-
-    const additionalRequests: Promise<AlbumPagingObject>[] = []
-
-    for (let i = initialAlbums.length; i < total; i += limit) {
-      additionalRequests.push(SpotifyRequester.sendRequest<AlbumPagingObject>('GET', `/me/albums?offset=${i}`))
-    }
-
-    const additionalPagingObjects = await Promise.allSettled(additionalRequests) as PromiseFulfilledResult<AlbumPagingObject>[]
-
-    additionalPagingObjects.forEach(pagingObject => {
-      const albums = pagingObject.value.items.map(item => item.album)
-      allAlbums.push(...albums)
-    })
-
-    return allAlbums
+  async getAllUserPlaylists () {
+    const playlistItems = await getAndUnpackAllPageObjects<SpotifyApi.PlaylistObjectSimplified>('/me/playlists')
+    return playlistItems
   },
 
   async transferPlayback (deviceId: string) {

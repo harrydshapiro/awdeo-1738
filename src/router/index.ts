@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig, Route, NavigationGuardNext } from 'vue-router'
 import Music from '@/views/Music.vue'
-import SpotifyRequester from '@/api/spotifyRequester'
 
 Vue.use(VueRouter)
 

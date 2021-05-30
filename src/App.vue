@@ -17,7 +17,7 @@ import store from '@/store'
 })
 export default class App extends Vue {
   mounted () {
-    store.dispatch.getUserAlbums()
+    store.dispatch.getMusic()
   }
 }
 </script>

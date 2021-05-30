@@ -610,7 +610,7 @@ declare namespace SpotifyApi {
    * GET /v1/users/{user_id}/playlists/{playlist_id}
    * https://developer.spotify.com/web-api/get-playlist/
    */
-  interface SinglePlaylistResponse extends PlaylistObjectFull {}
+  interface SinglePlaylistResponse extends PlaylistObjectSimplified {}
 
   /**
    * Get a playlist's tracks
@@ -626,7 +626,7 @@ declare namespace SpotifyApi {
    * POST /v1/users/{user_id}/playlists
    * https://developer.spotify.com/web-api/create-playlist/
    */
-  interface CreatePlaylistResponse extends PlaylistObjectFull {}
+  interface CreatePlaylistResponse extends PlaylistObjectSimplified {}
 
   /**
    * Change a Playlist’s Details
@@ -1034,7 +1034,7 @@ declare namespace SpotifyApi {
    * Playlist Object Full
    * [](https://developer.spotify.com/web-api/object-model/#playlist-object-full)
    */
-  interface PlaylistObjectFull extends PlaylistBaseObject {
+  interface PlaylistObjectSimplified extends PlaylistBaseObject {
     /**
        * Information about the followers of the playlist.
        */

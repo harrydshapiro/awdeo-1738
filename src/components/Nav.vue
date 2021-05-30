@@ -6,12 +6,12 @@
     <div v-if="currentRouteName !== 'Music'" class="music-toggle" @click="showMusicScreen">
       music
     </div>
-    <div class="play-pause-toggle" @click="toggleAudioPlayback">
+    <!-- <div class="play-pause-toggle" @click="toggleAudioPlayback">
       {{ playerPaused ? 'play' : 'pause' }}
     </div>
     <div class="shuffle-toggle" @click="toggleShuffle">
       {{ shuffled ? 'by\nartist' : 'shuffle' }}
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -36,7 +36,7 @@ export default class Nav extends Vue {
 
   toggleAudioPlayback () {
     const currentUri = store.state.currentPlayerURI
-    const uriToPlay = currentUri || store.getters.sortedAlbums[0]?.uri
+    const uriToPlay = currentUri || store.getters.sortedAlbumsAndPlaylists[0]?.uri
     if (!uriToPlay) return
     store.dispatch.togglePlayState(uriToPlay)
   }

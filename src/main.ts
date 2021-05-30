@@ -15,7 +15,6 @@ import SpotifyRequester from '@/api/spotifyRequester'
   Vue.config.productionTip = false
 
   if (!SpotifyRequester.accessToken || !SpotifyRequester.refreshToken) {
-    debugger
     if (window.location.pathname !== '/code-redirect') {
       SpotifyRequester.redirectToLogin()
     } else {

@@ -59,7 +59,6 @@ export class SpotifyConnection {
       this.clientId + ':' + this.clientSecret
     ).toString('base64')}`
     const requestData = `refresh_token=${this.refreshToken}&grant_type=refresh_token`
-    console.log(authHeader, requestData)
     const {
       data: { accessToken }
     } = await axios({
@@ -105,7 +104,6 @@ export class SpotifyConnection {
       headers,
       url: 'https://accounts.spotify.com/api/token'
     })
-    console.log(accessToken, refreshToken)
     if (accessToken && refreshToken) {
       this.accessToken = accessToken
       this.refreshToken = refreshToken

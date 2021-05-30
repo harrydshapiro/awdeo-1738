@@ -7,27 +7,33 @@
     }"
   >
     <div
-      v-for="(album, index) in albums"
+      v-for="(record, index) in media"
       :key="index"
       class="spine"
-      @click="selectSpine(album)"
+      @click="selectSpine(record)"
     >
-      <span>{{ album.name }}</span>
-      <span>{{ album.artists[0].name }}</span>
+      <span>{{ record.name }}</span>
+      <span>{{ spineArtistName(record) }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { SanitizedMedia } from '@/types/sanitizedMedia'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({})
 export default class Spines extends Vue {
-  @Prop({ required: true }) albums!: SpotifyApi.AlbumObjectFull[]
+  @Prop({ required: true }) media!: SanitizedMedia[]
   @Prop({ required: true }) textBaseline!: 'left' | 'right'
 
-  selectSpine (album: SpotifyApi.AlbumObjectFull) {
-    this.$emit('selectSpine', album.id)
+  selectSpine (media: SanitizedMedia) {
+    this.$emit('selectSpine', media.id)
+  }
+
+  spineArtistName (mediaObj: SanitizedMedia) {
+    if (mediaObj.type === 'playlist') return ''
+    else return mediaObj.artists[0].name
   }
 }
 </script>

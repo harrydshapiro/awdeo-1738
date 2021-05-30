@@ -4,6 +4,7 @@ import { createDirectStore } from 'direct-vuex'
 import { merge, cloneDeep } from 'lodash-es'
 import api from '@/api'
 import { identifyUser } from '@/analytics'
+import { SanitizedMedia, SanitizedPlaylist } from '@/types/sanitizedMedia'
 
 export enum AlbumSortMethod {
   AlbumName,
@@ -14,6 +15,7 @@ export enum AlbumSortMethod {
 
 export interface RootState {
   albums: Record<SpotifyApi.AlbumObjectFull['id'], SpotifyApi.AlbumObjectFull>,
+  playlists: Record<SanitizedPlaylist['id'], SanitizedPlaylist>,
   player: Spotify.SpotifyPlayer | null,
   playerDeviceId: string | null,
   playerPaused: boolean,
@@ -52,6 +54,13 @@ const {
       }, {})
       state.albums = merge({}, state.albums, newAlbumsObj)
     },
+    addPlaylists (state, playlists: SpotifyApi.PlaylistObjectSimplified[]) {
+      const newPlaylistsObj = playlists.reduce<Record<SpotifyApi.PlaylistObjectSimplified['id'], SpotifyApi.PlaylistObjectSimplified>>((acc, curr) => {
+        acc[curr.id] = curr
+        return acc
+      }, {})
+      state.playlists = merge({}, state.playlists, newPlaylistsObj)
+    },
     setPlayer (state, player: Spotify.SpotifyPlayer) {
       state.player = player
     },
@@ -69,10 +78,29 @@ const {
     }
   },
   actions: {
+    async getMusic (context) {
+      const { dispatch } = rootActionContext(context)
+      dispatch.getUserAlbums()
+      dispatch.getUserPlaylists()
+    },
+
     async getUserAlbums (context) {
       const { commit } = rootActionContext(context)
       const albums = await api.getAllUserAlbums()
       commit.addAlbums(albums)
+    },
+
+    async getUserPlaylists (context) {
+      const { commit } = rootActionContext(context)
+      const rawPlaylists = await api.getAllUserPlaylists()
+      const playlists = rawPlaylists.map((playlist) => {
+        const newPlaylist: SanitizedPlaylist = {
+          ...playlist,
+          artists: [{ name: 'ž' }]
+        }
+        return newPlaylist
+      })
+      commit.addPlaylists(playlists)
     },
 
     async addPlayer (context, player: Spotify.SpotifyPlayer) {
@@ -121,7 +149,6 @@ const {
 
     async togglePlayState (context, uri: string) {
       const { playerDeviceId, currentPlayerURI } = store.state
-      console.log(playerDeviceId)
       if (!playerDeviceId) return
 
       if (!store.state.playerPaused && currentPlayerURI !== uri) {
@@ -145,8 +172,10 @@ const {
     }
   },
   getters: {
-    sortedAlbums (state): SpotifyApi.AlbumObjectFull[] {
-      let filteredAlbums: SpotifyApi.AlbumObjectFull[] = cloneDeep(Object.values(state.albums))
+    sortedAlbumsAndPlaylists (state): SanitizedMedia[] {
+      const playlists = (state.playlists && Object.values(state.playlists)) || []
+      const albums = (state.albums && Object.values(state.albums)) || []
+      let filteredAlbums: SanitizedMedia[] = [...playlists, ...albums]
       switch (state.albumSortMethod) {
         case AlbumSortMethod.AlbumName:
           filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
@@ -156,12 +185,18 @@ const {
           break
         case AlbumSortMethod.ArtistName:
           filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
-            if (albumA.artists[0].name > albumB.artists[0].name) return 1
+            if (albumA.type === 'playlist') return 1
+            else if (albumB.type === 'playlist') return -1
+            else if (albumA.artists[0].name > albumB.artists[0].name) return 1
             else return -1
           })
           break
         case AlbumSortMethod.DateReleased:
-          filteredAlbums = filteredAlbums.sort((albumA, albumB) => new Date(albumA.release_date).getMilliseconds() - new Date(albumB.release_date).getMilliseconds())
+          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+            if (albumA.type === 'playlist') return 1
+            else if (albumB.type === 'playlist') return -1
+            else return new Date(albumA.release_date).getMilliseconds() - new Date(albumB.release_date).getMilliseconds()
+          })
           break
         case AlbumSortMethod.Random:
           filteredAlbums = filteredAlbums.sort(() => Math.random() - 0.5)

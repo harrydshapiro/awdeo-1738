@@ -1,15 +1,15 @@
 <template>
   <div class="music">
     <Spines
-      :albums="leftAlbums"
+      :media="leftMedia"
       :text-baseline="'left'"
       @selectSpine="selectSpine"
     />
     <RecordCover
-      :album="currentAlbum"
+      :album="currentMedia"
     />
     <Spines
-      :albums="rightAlbums"
+      :media="rightMedia"
       :text-baseline="'right'"
       @selectSpine="selectSpine"
     />
@@ -37,25 +37,25 @@ export default class Music extends Vue {
 
     const currentURI = store.state.currentPlayerURI
     if (currentURI) {
-      const uriToJumpTo = this.albums.findIndex(album => album.uri === currentURI)
+      const uriToJumpTo = this.media.findIndex(album => album.uri === currentURI)
       if (uriToJumpTo !== -1) this.currentSpineIndex = uriToJumpTo
     }
   }
 
-  get albums () {
-    return store.getters.sortedAlbums
+  get media () {
+    return store.getters.sortedAlbumsAndPlaylists
   }
 
-  get leftAlbums () {
-    return this.albums.slice(0, this.currentSpineIndex)
+  get leftMedia () {
+    return this.media.slice(0, this.currentSpineIndex)
   }
 
-  get rightAlbums () {
-    return this.albums.slice(this.currentSpineIndex + 1)
+  get rightMedia () {
+    return this.media.slice(this.currentSpineIndex + 1)
   }
 
-  get currentAlbum () {
-    return this.albums[this.currentSpineIndex]
+  get currentMedia () {
+    return this.media[this.currentSpineIndex]
   }
 
   initializeHotkeys () {
@@ -66,17 +66,27 @@ export default class Music extends Vue {
 
     hotkeys('right', (event, handler) => {
       event.preventDefault()
-      this.currentSpineIndex = Math.min(this.albums.length - 1, this.currentSpineIndex + 1)
+      this.currentSpineIndex = Math.min(this.media.length - 1, this.currentSpineIndex + 1)
+    })
+
+    hotkeys('shift+left', (event, handler) => {
+      event.preventDefault()
+      this.currentSpineIndex = 0
+    })
+
+    hotkeys('shift+right', (event, handler) => {
+      event.preventDefault()
+      this.currentSpineIndex = this.media.length - 1
     })
 
     hotkeys('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', (event, handler) => {
       const { key } = handler
       if (store.state.albumSortMethod === AlbumSortMethod.ArtistName) {
-        const firstMatchingAlbumIndex = this.albums.findIndex(album => {
+        const firstMatchingAlbumIndex = this.media.findIndex(album => {
           const artistFirstLetter = album.artists[0].name[0].toLowerCase()
           return artistFirstLetter >= key
         })
-        const indexToJumpTo = firstMatchingAlbumIndex === -1 ? this.albums.length - 1 : firstMatchingAlbumIndex
+        const indexToJumpTo = firstMatchingAlbumIndex === -1 ? this.media.length - 1 : firstMatchingAlbumIndex
         this.currentSpineIndex = indexToJumpTo
       }
     })
@@ -91,7 +101,7 @@ export default class Music extends Vue {
   }
 
   selectSpine (albumId: string) {
-    const albumIndex = this.albums.findIndex(album => album.id === albumId)
+    const albumIndex = this.media.findIndex(album => album.id === albumId)
     if (albumIndex !== -1) this.currentSpineIndex = albumIndex
   }
 }

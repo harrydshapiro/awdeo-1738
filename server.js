@@ -3,20 +3,20 @@ const serveStatic = require('serve-static')
 const path = require('path')
 const app = express()
 
-// // Force https middleware
-// function forceHttps (req, res, next) {
-//   if (!req.secure && req.hostname !== 'localhost') {
-//     res.redirect(`https://${req.hostname}${req.originalUrl}`)
-//   } else {
-//     next()
-//   }
-// }
+// Force https middleware
+function forceHttps (req, res, next) {
+  if (!req.secure && req.hostname !== 'localhost') {
+    res.redirect(`https://${req.hostname}${req.originalUrl}`)
+  } else {
+    next()
+  }
+}
 
-// // Force https in staging/prod
-// if (['staging', 'production'].includes(process.env.NODE_ENV)) {
-//   app.enable('trust proxy') // Since heroku is in front
-//   app.use(forceHttps)
-// }
+// Force https in staging/prod
+if (['staging', 'production'].includes(process.env.NODE_ENV)) {
+  app.enable('trust proxy') // Since heroku is in front
+  app.use(forceHttps)
+}
 
 // Serve static assets
 app.use(serveStatic(path.join(__dirname, 'dist')))

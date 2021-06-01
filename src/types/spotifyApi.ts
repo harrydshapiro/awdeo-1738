@@ -1050,6 +1050,7 @@ declare namespace SpotifyApi {
    * [](https://developer.spotify.com/web-api/object-model/)
    */
   interface PlaylistObjectSimplified extends PlaylistBaseObject {
+     // @ts-ignore
     tracks: {
       href: string;
       total: number;

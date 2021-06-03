@@ -27,6 +27,8 @@
         <li>Press a letter A - Z to jump through artist names.</li>
         <li>Use your &lt; and &gt; to flip through records. Hold shift as well to go to each extreme.</li>
         <li>Press shift-s to toggle shuffle.</li>
+        <li>Press shift-a to view only albums. Press it again to view all media.</li>
+        <li>Press shift-p to view only playlists. Press it again to view all media.</li>
       </ul>
     </div>
     <div class="contact">

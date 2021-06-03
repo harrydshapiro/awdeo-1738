@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import store, { AlbumSortMethod } from '@/store'
+import store, { AlbumFilterMethod, AlbumSortMethod } from '@/store'
 import Spines from '@/components/Spines.vue'
 import RecordCover from '@/components/RecordCover.vue'
 import hotkeys from 'hotkeys-js'
@@ -43,7 +43,7 @@ export default class Music extends Vue {
   }
 
   get media () {
-    return store.getters.sortedAlbumsAndPlaylists
+    return store.getters.albumsAndPlaylistsInView
   }
 
   get leftMedia () {
@@ -96,6 +96,22 @@ export default class Music extends Vue {
         store.dispatch.changeAlbumSorting(AlbumSortMethod.Random)
       } else {
         store.dispatch.changeAlbumSorting(AlbumSortMethod.ArtistName)
+      }
+    })
+
+    hotkeys('shift+a', (event, handler) => {
+      if (store.state.albumFilterMethod !== AlbumFilterMethod.Album) {
+        store.dispatch.changeAlbumFiltering(AlbumFilterMethod.Album)
+      } else {
+        store.dispatch.changeAlbumFiltering(AlbumFilterMethod.All)
+      }
+    })
+
+    hotkeys('shift+p', (event, handler) => {
+      if (store.state.albumFilterMethod !== AlbumFilterMethod.Playlist) {
+        store.dispatch.changeAlbumFiltering(AlbumFilterMethod.Playlist)
+      } else {
+        store.dispatch.changeAlbumFiltering(AlbumFilterMethod.All)
       }
     })
   }

@@ -36,7 +36,7 @@ export default class Nav extends Vue {
 
   toggleAudioPlayback () {
     const currentUri = store.state.currentPlayerURI
-    const uriToPlay = currentUri || store.getters.sortedAlbumsAndPlaylists[0]?.uri
+    const uriToPlay = currentUri || store.getters.albumsAndPlaylistsInView[0]?.uri
     if (!uriToPlay) return
     store.dispatch.togglePlayState(uriToPlay)
   }

@@ -13,6 +13,11 @@ export enum AlbumSortMethod {
   Random
 }
 
+export enum AlbumFilterMethod {
+  All,
+  Album,
+  Playlist
+}
 export interface RootState {
   albums: Record<SpotifyApi.AlbumObjectFull['id'], SpotifyApi.AlbumObjectFull>,
   playlists: Record<SanitizedPlaylist['id'], SanitizedPlaylist>,
@@ -21,7 +26,8 @@ export interface RootState {
   playerPaused: boolean,
   currentPlayerURI: string | null,
   albumSortMethod: AlbumSortMethod,
-  albumSortDirection: 'ascending' | 'descending'
+  albumSortDirection: 'ascending' | 'descending',
+  albumFilterMethod: AlbumFilterMethod
 }
 
 Vue.use(Vuex)
@@ -33,7 +39,8 @@ const state: RootState = {
   playerPaused: true,
   currentPlayerURI: null,
   albumSortMethod: AlbumSortMethod.ArtistName,
-  albumSortDirection: 'descending'
+  albumSortDirection: 'descending',
+  albumFilterMethod: AlbumFilterMethod.All
 } as RootState // You have to cast it here else it complains about not having a user property initialization... however vuex composes the submodules itself so you can't actually provide a def
 
 const {
@@ -75,6 +82,9 @@ const {
     },
     setAlbumSorting (state, sortMethod: AlbumSortMethod) {
       state.albumSortMethod = sortMethod
+    },
+    setAlbumFilter (state, filterMethod: AlbumFilterMethod) {
+      state.albumFilterMethod = filterMethod
     }
   },
   actions: {
@@ -169,22 +179,27 @@ const {
     changeAlbumSorting (context, sortMethod: AlbumSortMethod) {
       const { commit } = rootActionContext(context)
       commit.setAlbumSorting(sortMethod)
+    },
+
+    changeAlbumFiltering (context, filterMethod: AlbumFilterMethod) {
+      const { commit } = rootActionContext(context)
+      commit.setAlbumFilter(filterMethod)
     }
   },
   getters: {
-    sortedAlbumsAndPlaylists (state): SanitizedMedia[] {
+    albumsAndPlaylistsInView (state): SanitizedMedia[] {
       const playlists = (state.playlists && Object.values(state.playlists)) || []
       const albums = (state.albums && Object.values(state.albums)) || []
-      let filteredAlbums: SanitizedMedia[] = [...playlists, ...albums]
+      let sortedAlbums: SanitizedMedia[] = [...playlists, ...albums]
       switch (state.albumSortMethod) {
         case AlbumSortMethod.AlbumName:
-          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+          sortedAlbums = sortedAlbums.sort((albumA, albumB) => {
             if (albumA.name > albumB.name) return 1
             else return -1
           })
           break
         case AlbumSortMethod.ArtistName:
-          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+          sortedAlbums = sortedAlbums.sort((albumA, albumB) => {
             if (albumA.type === 'playlist') return 1
             else if (albumB.type === 'playlist') return -1
             else if (albumA.artists[0].name > albumB.artists[0].name) return 1
@@ -192,16 +207,25 @@ const {
           })
           break
         case AlbumSortMethod.DateReleased:
-          filteredAlbums = filteredAlbums.sort((albumA, albumB) => {
+          sortedAlbums = sortedAlbums.sort((albumA, albumB) => {
             if (albumA.type === 'playlist') return 1
             else if (albumB.type === 'playlist') return -1
             else return new Date(albumA.release_date).getMilliseconds() - new Date(albumB.release_date).getMilliseconds()
           })
           break
         case AlbumSortMethod.Random:
-          filteredAlbums = filteredAlbums.sort(() => Math.random() - 0.5)
+          sortedAlbums = sortedAlbums.sort(() => Math.random() - 0.5)
           break
       }
+      const filteredAlbums = sortedAlbums.filter(album => {
+        if (state.albumFilterMethod === AlbumFilterMethod.Album) {
+          return album.type === 'album'
+        } else if (state.albumFilterMethod === AlbumFilterMethod.Playlist) {
+          return album.type === 'playlist'
+        } else {
+          return true
+        }
+      })
       return filteredAlbums
     }
   }

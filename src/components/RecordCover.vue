@@ -78,7 +78,7 @@ export default class RecordCover extends Vue {
       justify-content: center;
       align-items: center;
       opacity: 0;
-      transition: 0.5s;
+      transition: 0.28s;
 
       svg {
         fill: white;
